@@ -1,26 +1,30 @@
 import React from "react";
+import "../../styles/index.css"; 
 
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+import backgroundImage from "../../img/pexels-googledeepmind-17483850.jpg";
 
-//create your first component
 const Home = () => {
-	return (
-		<div className="text-center">
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
-		</div>
-	);
+    return (
+        <div className="container-fluid text-center">
+            {/* Fondo de pantalla */}
+            <div
+                className="background-image"
+                style={{ backgroundImage: `url(${backgroundImage})` }}
+            ></div>
+
+            <div className="content">
+                <p className="mt-4">
+                    Bienvenido a la aplicación de Todolist de 4Geeks Academy.
+                    ¡Empieza a organizar tus tareas hoy mismo!
+                </p>
+                <p className="mt-4">
+                    Hecho por{" "}
+                    <a href="http://www.4geeksacademy.com">4Geeks Academy</a>,
+                    con amor 💚
+                </p>
+            </div>
+        </div>
+    );
 };
 
 export default Home;
