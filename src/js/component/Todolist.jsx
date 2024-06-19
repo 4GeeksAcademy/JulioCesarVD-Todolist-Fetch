@@ -1,69 +1,140 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleChange = (event) => {
-    setInputText(event.target.value);
+  
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+ 
+  const fetchTodos = () => {
+    fetch('https://playground.4geeks.com/todo/users/JulioCesarVD')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch todos');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setTodos(data.todos);
+      })
+      .catch(error => {
+        console.error('Error fetching todos:', error);
+        setError('Failed to fetch todos from backend API');
+      });
   };
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      addTodo();
-    }
+ 
+  const addTodo = (label) => {
+    fetch('https://playground.4geeks.com/todo/todos/JulioCesarVD', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ label, is_done: false }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to add todo to backend API');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setTodos([...todos, data]);
+      })
+      .catch(error => {
+        console.error('Error adding todo:', error);
+      
+      });
   };
 
-  const addTodo = () => {
-    if (inputText.trim() !== '') {
-      setTodos([...todos, { id: Date.now(), text: inputText }]);
-      setInputText('');
-    }
+  
+  const updateTodo = (id, label) => {
+    fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ label }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to update todo on backend API');
+        }
+   
+      })
+      .catch(error => {
+        console.error('Error updating todo:', error);
+        
+      });
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  
+  const removeTodo = (id) => {
+    fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
+      method: 'DELETE',
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to delete todo from backend API');
+        }
+        setTodos(todos.filter(todo => todo.id !== id));
+      })
+      .catch(error => {
+        console.error(`Error deleting todo with ID ${id}:`, error);
+      
+      });
+  };
+
+  
+  const clearTodos = () => {
+    setTodos([]);
   };
 
   return (
     <div className="todo-list-container">
       <div className="todo-list-box">
-        <div className="todo-list-input">
-          <input
-            type="text"
-            value={inputText}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Añadir tarea..."
-            className='input-inside'
-          />
-        </div>
-        <div className="todo-list">
-          <div className="list-group">
-            {todos.length === 0 ? (
-              <li className="list-group-item">No hay tareas, añadir tareas</li>
-            ) : (
-              todos.map(todo => (
-                <li
-                  key={todo.id}
-                  onMouseEnter={() => setShowDeleteButton(true)}
-                  onMouseLeave={() => setShowDeleteButton(false)}
-                  className="list-group-item d-flex justify-content-between align-items-center"
-                >
-                  <span>{todo.text}</span>
-                  {showDeleteButton && (
-                    <button onClick={() => deleteTodo(todo.id)} className="btn btn-danger">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  )}
-                </li>
-              ))
-            )}
+        <h2>Todo List</h2>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          const input = e.target.elements.todoInput;
+          addTodo(input.value);
+          input.value = '';
+        }}>
+          <div className="todo-list-input d-flex gap-2">
+            <input type="text" name="todoInput" placeholder="Agrega una tarea" className="input-inside"/>
+            <button type="summit" class="btn btn-success ">Add</button>
           </div>
-        </div>
+          
+        </form>
+        <ul className="list-group">
+          {todos.map((todo, index) => (
+            <li key={index} className="list-group-item">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  value={todo.label}
+                  onChange={(e) => updateTodo(todo.id, e.target.value)}
+                />
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  onClick={() => removeTodo(todo.id)}
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <button className='btn btn-danger' onClick={clearTodos}>Clear All</button>
+        {error && <p>{error}</p>}
       </div>
     </div>
   );
