@@ -1,6 +1,6 @@
 import React from "react";
 import TodoList from "./Todolist";
-import backgroundImage from "../../img/pexels-googledeepmind-17483850.jpg";
+import backgroundImage from "../../img/pexels-mart-production-7718886.jpg";
 
 const Home = () => {
   return (
@@ -17,9 +17,9 @@ const Home = () => {
           ¡Empieza a organizar tus tareas hoy mismo!
         </p>
         <p className="mt-4">
-          Hecho por{" "}
-          <a href="https://github.com/JulioCesarVD">Github: JulioCesarVD</a>,
-          con amor 💚
+          Hecho por: Github:{" "}
+          <a href="https://github.com/JulioCesarVD"> JulioCesarVD</a>,
+          
         </p>
      
       </div>
